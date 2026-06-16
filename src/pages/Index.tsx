@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, Loader2 } from "lucide-react";
 import Header from "@/components/Header";
 import AQIDashboard from "@/components/AQIDashboard";
@@ -12,6 +12,11 @@ import { useAirQuality } from "@/hooks/useAirQuality";
 const Index = () => {
   const [input, setInput] = useState("");
   const { data, loading, error, search } = useAirQuality();
+
+  useEffect(() => {
+    const api = import.meta.env.VITE_API_URL;
+    if (api) fetch(`${api}/`).catch(() => {});
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
