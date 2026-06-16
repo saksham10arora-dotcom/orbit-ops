@@ -4,28 +4,25 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, TrendingUp, Wind, AlertTriangle, CheckCircle, Info } from "lucide-react";
 import { useState } from "react";
 
-const ForecastChart = () => {
+import type { AQIHourly } from "@/hooks/useAirQuality";
+
+interface Props {
+  forecast: AQIHourly[];
+  loading: boolean;
+}
+
+const ForecastChart = ({ forecast, loading }: Props) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
-  const forecastData = [
-    { time: "00:00", aqi: 82, pm25: 24.1, o3: 65, no2: 38, temp: 22, humidity: 68 },
-    { time: "03:00", aqi: 78, pm25: 22.8, o3: 62, no2: 35, temp: 20, humidity: 72 },
-    { time: "06:00", aqi: 85, pm25: 25.3, o3: 68, no2: 42, temp: 24, humidity: 65 },
-    { time: "09:00", aqi: 92, pm25: 28.1, o3: 75, no2: 48, temp: 28, humidity: 58 },
-    { time: "12:00", aqi: 98, pm25: 31.2, o3: 82, no2: 52, temp: 32, humidity: 52 },
-    { time: "15:00", aqi: 105, pm25: 33.8, o3: 88, no2: 55, temp: 34, humidity: 48 },
-    { time: "18:00", aqi: 95, pm25: 29.5, o3: 78, no2: 45, temp: 30, humidity: 55 },
-    { time: "21:00", aqi: 88, pm25: 26.2, o3: 70, no2: 40, temp: 26, humidity: 62 },
-    { time: "24:00", aqi: 84, pm25: 24.8, o3: 66, no2: 37, temp: 23, humidity: 68 },
-    { time: "27:00", aqi: 80, pm25: 23.1, o3: 63, no2: 34, temp: 21, humidity: 74 },
-    { time: "30:00", aqi: 86, pm25: 25.7, o3: 69, no2: 41, temp: 25, humidity: 64 },
-    { time: "33:00", aqi: 93, pm25: 29.2, o3: 76, no2: 49, temp: 29, humidity: 57 },
-    { time: "36:00", aqi: 100, pm25: 32.1, o3: 84, no2: 53, temp: 33, humidity: 51 },
-    { time: "39:00", aqi: 96, pm25: 30.5, o3: 79, no2: 46, temp: 31, humidity: 54 },
-    { time: "42:00", aqi: 90, pm25: 27.8, o3: 72, no2: 42, temp: 27, humidity: 60 },
-    { time: "45:00", aqi: 87, pm25: 26.1, o3: 68, no2: 39, temp: 24, humidity: 66 },
-    { time: "48:00", aqi: 85, pm25: 24.9, o3: 65, no2: 36, temp: 22, humidity: 70 }
-  ];
+  const forecastData = forecast.length > 0
+    ? forecast.map(f => ({
+        time: f.hour,
+        aqi: f.aqi ?? 0,
+        pm25: f.pm2_5 ?? 0,
+        o3: f.o3 ?? 0,
+        no2: f.no2 ?? 0,
+      }))
+    : [];
 
   const aqiCategories = forecastData.reduce((acc, data) => {
     if (data.aqi <= 50) acc.good++;
@@ -114,7 +111,7 @@ const ForecastChart = () => {
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
-      const percentage = ((data.value / forecastData.length) * 100).toFixed(1);
+      const percentage = forecastData.length > 0 ? ((data.value / forecastData.length) * 100).toFixed(1) : "0";
       const Icon = data.icon;
       return (
         <div className="bg-white/98 backdrop-blur-sm border-2 rounded-xl p-4 shadow-2xl max-w-xs" style={{ borderColor: data.color }}>
@@ -144,10 +141,11 @@ const ForecastChart = () => {
   };
 
   const currentTime = new Date();
-  const peakAQI = Math.max(...forecastData.map(d => d.aqi));
-  const peakTime = forecastData.find(d => d.aqi === peakAQI)?.time;
-  const minAQI = Math.min(...forecastData.map(d => d.aqi));
-  const avgAQI = Math.round(forecastData.reduce((sum, d) => sum + d.aqi, 0) / forecastData.length);
+  const hasData = forecastData.length > 0;
+  const peakAQI = hasData ? Math.max(...forecastData.map(d => d.aqi)) : null;
+  const peakTime = hasData ? forecastData.find(d => d.aqi === peakAQI)?.time : null;
+  const minAQI = hasData ? Math.min(...forecastData.map(d => d.aqi)) : null;
+  const avgAQI = hasData ? Math.round(forecastData.reduce((sum, d) => sum + d.aqi, 0) / forecastData.length) : null;
 
   return (
     <section id="forecast" className="py-12 bg-gradient-to-b from-blue-50 via-purple-50 to-white">
@@ -180,8 +178,8 @@ const ForecastChart = () => {
                   </div>
                   <div>
                     <p className="text-xs text-gray-600 font-medium mb-1">Peak AQI</p>
-                    <p className="text-2xl font-bold text-orange-600">{peakAQI}</p>
-                    <p className="text-xs text-gray-500 mt-1">at {peakTime}</p>
+                    <p className="text-2xl font-bold text-orange-600">{peakAQI ?? "--"}</p>
+                    <p className="text-xs text-gray-500 mt-1">{peakTime ? `at ${peakTime}` : "search a city"}</p>
                   </div>
                 </div>
               </CardContent>
@@ -195,7 +193,7 @@ const ForecastChart = () => {
                   </div>
                   <div>
                     <p className="text-xs text-gray-600 font-medium mb-1">Best AQI</p>
-                    <p className="text-2xl font-bold text-green-600">{minAQI}</p>
+                    <p className="text-2xl font-bold text-green-600">{minAQI ?? "--"}</p>
                     <p className="text-xs text-gray-500 mt-1">Morning hours</p>
                   </div>
                 </div>
@@ -210,7 +208,7 @@ const ForecastChart = () => {
                   </div>
                   <div>
                     <p className="text-xs text-gray-600 font-medium mb-1">Average AQI</p>
-                    <p className="text-2xl font-bold text-blue-600">{avgAQI}</p>
+                    <p className="text-2xl font-bold text-blue-600">{avgAQI ?? "--"}</p>
                     <p className="text-xs text-gray-500 mt-1">48-hr period</p>
                   </div>
                 </div>
@@ -281,7 +279,7 @@ const ForecastChart = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {pieData.map((item, index) => {
                     const Icon = item.icon;
-                    const percentage = ((item.value / forecastData.length) * 100).toFixed(0);
+                    const percentage = forecastData.length > 0 ? ((item.value / forecastData.length) * 100).toFixed(0) : "0";
                     return (
                       <div 
                         key={index} 

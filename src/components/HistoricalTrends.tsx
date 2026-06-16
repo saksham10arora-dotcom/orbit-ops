@@ -3,26 +3,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, TrendingUp } from "lucide-react";
 
-const ForecastChart = () => {
-  const forecastData = [
-    { time: "00:00", aqi: 82, pm25: 24.1, o3: 65, no2: 38, temp: 22, humidity: 68 },
-    { time: "03:00", aqi: 78, pm25: 22.8, o3: 62, no2: 35, temp: 20, humidity: 72 },
-    { time: "06:00", aqi: 85, pm25: 25.3, o3: 68, no2: 42, temp: 24, humidity: 65 },
-    { time: "09:00", aqi: 92, pm25: 28.1, o3: 75, no2: 48, temp: 28, humidity: 58 },
-    { time: "12:00", aqi: 98, pm25: 31.2, o3: 82, no2: 52, temp: 32, humidity: 52 },
-    { time: "15:00", aqi: 105, pm25: 33.8, o3: 88, no2: 55, temp: 34, humidity: 48 },
-    { time: "18:00", aqi: 95, pm25: 29.5, o3: 78, no2: 45, temp: 30, humidity: 55 },
-    { time: "21:00", aqi: 88, pm25: 26.2, o3: 70, no2: 40, temp: 26, humidity: 62 },
-    { time: "24:00", aqi: 84, pm25: 24.8, o3: 66, no2: 37, temp: 23, humidity: 68 },
-    { time: "27:00", aqi: 80, pm25: 23.1, o3: 63, no2: 34, temp: 21, humidity: 74 },
-    { time: "30:00", aqi: 86, pm25: 25.7, o3: 69, no2: 41, temp: 25, humidity: 64 },
-    { time: "33:00", aqi: 93, pm25: 29.2, o3: 76, no2: 49, temp: 29, humidity: 57 },
-    { time: "36:00", aqi: 100, pm25: 32.1, o3: 84, no2: 53, temp: 33, humidity: 51 },
-    { time: "39:00", aqi: 96, pm25: 30.5, o3: 79, no2: 46, temp: 31, humidity: 54 },
-    { time: "42:00", aqi: 90, pm25: 27.8, o3: 72, no2: 42, temp: 27, humidity: 60 },
-    { time: "45:00", aqi: 87, pm25: 26.1, o3: 68, no2: 39, temp: 24, humidity: 66 },
-    { time: "48:00", aqi: 85, pm25: 24.9, o3: 65, no2: 36, temp: 22, humidity: 70 }
-  ];
+import type { AQIHourly } from "@/hooks/useAirQuality";
+
+interface Props {
+  historical: AQIHourly[];
+  loading: boolean;
+}
+
+const HistoricalTrends = ({ historical, loading }: Props) => {
+  const forecastData = historical.length > 0
+    ? historical.map(h => ({
+        time: h.hour,
+        aqi: h.aqi ?? 0,
+        pm25: h.pm2_5 ?? 0,
+        o3: h.o3 ?? 0,
+        no2: h.no2 ?? 0,
+      }))
+    : [];
 
   const getAQIColor = (aqi: number) => {
     if (aqi <= 50) return "#22c55e";
@@ -249,4 +246,4 @@ const ForecastChart = () => {
   );
 };
 
-export default ForecastChart;
+export default HistoricalTrends;
