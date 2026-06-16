@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -6,12 +6,21 @@ import {
   Popup,
   Circle,
   Rectangle,
+  useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+
+function FlyTo({ lat, lon }: { lat: number; lon: number }) {
+  const map = useMap();
+  useEffect(() => {
+    map.flyTo([lat, lon], 11, { duration: 1.2 });
+  }, [lat, lon, map]);
+  return null;
+}
 
 type Location = {
   id: string;
@@ -278,11 +287,16 @@ const DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-export default function InteractiveMap() {
+interface Props {
+  lat?: number;
+  lon?: number;
+  city?: string;
+  aqi?: number | null;
+}
+
+export default function InteractiveMap({ lat, lon, city, aqi }: Props) {
   const [mapLayer, setMapLayer] = useState<MapLayer>("aqi");
-  const [selectedLocation, setSelectedLocation] = useState<Location | null>(
-    null
-  );
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
 
   const getAQIValue = (location: Location, layer: MapLayer) => {
     return layer === "aqi" ? location.groundAQI : location.satelliteAQI;
@@ -312,6 +326,21 @@ export default function InteractiveMap() {
                 url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
                 attribution="&copy; Esri & contributors"
               />
+            )}
+
+            {lat && lon && <FlyTo lat={lat} lon={lon} />}
+
+            {lat && lon && city && (
+              <Marker
+                position={[lat, lon]}
+                icon={getMarkerIcon(aqi ?? 0)}
+              >
+                <Popup>
+                  <strong>{city}</strong>
+                  <br />
+                  {aqi != null ? `US AQI: ${Math.round(aqi)}` : "AQI data loading..."}
+                </Popup>
+              </Marker>
             )}
 
             {highPollutionZones.map((zone) => (
