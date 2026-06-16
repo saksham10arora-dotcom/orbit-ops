@@ -6,6 +6,7 @@ import InteractiveMap from "@/components/InteractiveMap";
 import ForecastChart from "@/components/ForecastChart";
 import AlertPanel from "@/components/AlertPanel";
 import HistoricalTrends from "@/components/HistoricalTrends";
+import MLPrediction from "@/components/MLPrediction";
 import Footer from "@/components/Footer";
 import { useAirQuality } from "@/hooks/useAirQuality";
 
@@ -60,6 +61,7 @@ const Index = () => {
         <ForecastChart forecast={data?.forecast ?? []} loading={loading} />
         <AlertPanel />
         <HistoricalTrends historical={data?.historical ?? []} loading={loading} />
+        <MLPrediction city={data?.city} />
       </main>
       <Footer />
     </div>
