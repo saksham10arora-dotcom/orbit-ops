@@ -6,33 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 
 const AlertPanel = () => {
-  const [alerts, setAlerts] = useState([
-    {
-      id: 1,
-      level: "warning",
-      title: "Air Quality Alert",
-      message: "AQI levels are expected to reach 105 (Unhealthy for Sensitive Groups) between 12:00-15:00 today.",
-      recommendations: [
-        "Sensitive individuals should limit outdoor activities",
-        "Close windows and use air filtration if available",
-        "Avoid strenuous outdoor exercise"
-      ],
-      timestamp: "2024-01-15T10:30:00Z",
-      active: true
-    },
-    {
-      id: 2,
-      level: "info",
-      title: "Weather Impact Notice",
-      message: "High temperatures and low wind speeds may increase pollution concentrations this afternoon.",
-      recommendations: [
-        "Plan outdoor activities for early morning",
-        "Stay hydrated and seek shade when outside"
-      ],
-      timestamp: "2024-01-15T08:00:00Z",
-      active: true
-    }
-  ]);
+  const [alerts, setAlerts] = useState<{id: number; level: string; title: string; message: string; recommendations: string[]; timestamp: string; active: boolean}[]>([]);
 
   const dismissAlert = (id: number) => {
     setAlerts(alerts.map(alert => 
@@ -165,7 +139,7 @@ const AlertPanel = () => {
                 <Card key={index} className="h-full">
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
-                      <section.icon className="h-5 w-5 text-nasa-blue" />
+                      <section.icon className="h-5 w-5 text-blue-500" />
                       <span className="text-lg">{section.title}</span>
                     </CardTitle>
                   </CardHeader>
@@ -173,7 +147,7 @@ const AlertPanel = () => {
                     <ul className="space-y-3">
                       {section.items.map((item, itemIndex) => (
                         <li key={itemIndex} className="flex items-start space-x-2 text-sm">
-                          <span className="text-nasa-blue mt-1.5 flex-shrink-0">•</span>
+                          <span className="text-blue-500 mt-1.5 flex-shrink-0">•</span>
                           <span>{item}</span>
                         </li>
                       ))}

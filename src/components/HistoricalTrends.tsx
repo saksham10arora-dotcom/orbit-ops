@@ -90,7 +90,7 @@ const HistoricalTrends = ({ historical, loading }: Props) => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-10">
           <h2 className="text-4xl font-bold mb-3 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Predicts Pollutants for Next 48 Hours
+            Historical Air Quality — Past 7 Days
           </h2>
           <p className="text-gray-600 text-lg">Predicted Pollutants levels with hourly resolution</p>
         </div>

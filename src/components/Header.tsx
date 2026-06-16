@@ -21,7 +21,7 @@ const Header = () => {
               <Satellite className="h-8 w-8 text-blue-400" />
               <div>
                 <h1 className="text-xl font-bold text-white">OrbitAir</h1>
-                <p className="text-xs text-blue-300">Powered by NASA TEMPO</p>
+                <p className="text-xs text-blue-300">Powered by Open-Meteo</p>
               </div>
             </div>
           </div>
