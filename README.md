@@ -1,224 +1,89 @@
-# 🌫️ Neighborhood Air – Hyperlocal Air Quality Forecasting Platform
+# OrbitAir — Hyperlocal Air Quality Platform
 
-> A scalable web platform that predicts **neighborhood-level air pollution** using satellite observations, ground sensors, and weather data — helping people plan daily activities at safer times instead of relying on inaccurate citywide AQI averages.
-
----
-
-## ⚠️ Important
-
-All Machine Learning and data processing work is in the **`Machine_learning`** branch.
-
-```bash
-git checkout Machine_learning
-```
-
-| Notebook | Purpose |
-|---|---|
-| `tempo_complete_download.ipynb` | Downloads NASA TEMPO satellite data |
-| `data_preprocessing.ipynb` | Cleans and merges environmental datasets |
-| `air_quality_model.ipynb` | ML forecasting models and evaluation |
+> Search any city, get real-time AQI, pollutant breakdown, 48-hour forecast, and interactive map — all from live data sources, no API keys required.
 
 ---
 
-## 🧩 Problem
+## What It Does
 
-Existing AQI apps depend on **few monitoring stations**, which means:
+Most AQI apps show a single citywide number from a handful of sensors. OrbitAir fuses multiple data streams to give you a complete picture:
 
-- Pollution can differ **street-to-street**
-- City AQI is often **misleading**
-- Users **cannot plan** next-day activities
-- **No explanation** is provided for pollution spikes
+- **Current AQI** (US standard) with color-coded severity
+- **Pollutant breakdown** — PM2.5, PM10, NO2, O3
+- **Weather context** — temperature, humidity, wind speed, UV index
+- **48-hour hourly forecast** — see when air quality peaks or improves
+- **7-day historical trends** — understand patterns over the past week
+- **Interactive map** — flies to the searched city with a live AQI marker
 
-> **Example:** A city AQI of 120 does not mean your specific area has the same air quality.
-
----
-
-## ✅ Our Solution
-
-We create **hyperlocal pollution forecasts** by fusing multiple environmental data sources.
-
-### Data Sources
-- 🛰️ NASA TEMPO satellite observations
-- 📡 Ground monitoring stations (EPA / OpenAQ)
-- 🌤️ Weather data (NOAA)
-
-### Instead of:
-> *"Air quality is poor"*
-
-### We show:
-> *"NO₂ spike expected 4–6 PM due to traffic emissions and low wind speed"*
-
----
-
-## ✨ Features
-
-### 🌍 Hyperlocal Forecasting
-Downscales large satellite grids (~10 km) to **street-level predictions** using machine learning.
-
-### 🧠 Explainable Predictions
-Shows *why* pollution increases — traffic corridors, weather conditions, industrial activity.
-
-### 🗺️ Interactive Map
-Map-based visualization showing local risk levels at a glance.
-
-### 🔔 Personalized Alerts
-Pin your **home, office, school, or park** and receive alerts when pollution crosses your thresholds.
-
-### 📅 Daily Planning
-Helps you decide the best time to:
-- Exercise outdoors
-- Commute safely
-- Plan outdoor photography or travel
-
----
-
-## 🏗️ System Architecture
-
-```
-Satellite (TEMPO)
-       ↓
-Ground Sensors (EPA/OpenAQ)
-       ↓
-Weather Data (NOAA)
-       ↓
-Data Preprocessing
-       ↓
-Feature Engineering
-       ↓
-Machine Learning Forecast
-       ↓
-Time-Series Database
-       ↓
-FastAPI Backend
-       ↓
-Web Dashboard + Alerts
-```
-
----
-
-## 🛠️ Tech Stack
+## Stack
 
 | Layer | Technology |
 |---|---|
-| **Backend** | FastAPI (Python async API), Docker |
-| **Database (MVP)** | SQLite |
-| **Database (Production)** | TimescaleDB (PostgreSQL) + PostGIS |
-| **Data Processing** | xarray + dask, Geopandas, Zarr |
-| **Machine Learning** | scikit-learn (Random Forest, Gradient Boosting); Future: PyTorch |
-| **Frontend** | Next.js (React), Mapbox, Leaflet |
-| **Infrastructure** | Docker, Kubernetes, S3-compatible storage, Prometheus + Grafana |
+| **Frontend** | React 18 + TypeScript + Vite |
+| **UI** | shadcn/ui + Tailwind CSS + Recharts + Leaflet |
+| **Backend** | FastAPI (Python) |
+| **Air Quality Data** | [Open-Meteo Air Quality API](https://open-meteo.com/en/docs/air-quality-api) |
+| **Weather Data** | [Open-Meteo Forecast API](https://open-meteo.com/en/docs) |
+| **Geocoding** | OpenStreetMap Nominatim |
 
----
+No API keys needed. All data sources are free and open.
 
-## 🚀 Getting Started
+## Running Locally
 
-### Prerequisites
-- Python 3.10+
-- Node.js 18+
-- Docker (recommended)
-- Git
-
-### 1. Clone the Repository
+### Backend
 
 ```bash
-git clone https://github.com/<your-username>/<repo-name>.git
-cd <repo-name>
+cd aqi_mvp_backend
+pip install fastapi httpx uvicorn
+uvicorn app.main:app --reload --port 8000
 ```
 
-### 2. Backend Setup
+API available at `http://localhost:8000`
 
-```bash
-# Create and activate virtual environment
-python -m venv venv
-
-# Windows
-venv\Scripts\activate
-
-# Linux / Mac
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run backend
-uvicorn app.main:app --reload
+**Endpoint:**
+```
+GET /api/city?name=London
 ```
 
-API docs available at: `http://localhost:8000/docs`
+Returns current AQI, pollutants, weather, 48h forecast, and 7d historical data.
 
-### 3. Frontend Setup
+### Frontend
 
 ```bash
-cd frontend
 npm install
 npm run dev
 ```
 
-Open: `http://localhost:3000`
+Open `http://localhost:5173`, click **Enter Site**, search any city.
 
-### 4. Docker (Recommended)
+## Example Response
 
-```bash
-docker-compose build
-docker-compose up
+```json
+{
+  "city": "New Delhi",
+  "lat": 28.61,
+  "lon": 77.21,
+  "current": {
+    "aqi": 526,
+    "label": "Hazardous",
+    "pm2_5": 85.7,
+    "pm10": 377.2,
+    "no2": 7.5,
+    "o3": 161.0,
+    "temperature": 35.0,
+    "humidity": 38,
+    "wind_speed": 3.9,
+    "uv_index": 7.65
+  },
+  "forecast": [ ... ],
+  "historical": [ ... ]
+}
 ```
 
----
+## Team
 
-## 🧪 Machine Learning Workflow
+Built at a hackathon by Satyansh Gaur, Saksham Arora, Sarthak Mehta, Vaibhav.
 
-After switching to the `Machine_learning` branch, run notebooks in this order:
+## License
 
-1. `tempo_complete_download.ipynb`
-2. `data_preprocessing.ipynb`
-3. `air_quality_model.ipynb`
-
-**Outputs:** cleaned dataset · trained models · evaluation metrics · prediction results
-
----
-
-## 📁 Project Structure
-
-```
-.
-├── app/                # FastAPI backend
-├── frontend/           # Next.js frontend
-├── data/               # Datasets
-├── notebooks/          # Experiments & ML notebooks
-├── docker-compose.yml
-├── requirements.txt
-└── README.md
-```
-
----
-
-## 🗺️ Roadmap
-
-- [ ] SMS & push notifications
-- [ ] Exposure tracking dashboard
-- [ ] Mobile PWA app
-- [ ] Public API (Data-as-a-Service)
-- [ ] Institutional dashboard (schools / societies)
-- [ ] Advanced ML models (LSTM / GNN)
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a new branch (`git checkout -b feature/your-feature`)
-3. Commit your changes
-4. Open a Pull Request
-
----
-
-## 📄 License
-
-- MIT License
-
-
----
-
-## 📬 Contact
-
-For collaboration, research, or partnership inquiries — **open an Issue** in the repository.
+MIT
