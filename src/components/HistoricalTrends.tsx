@@ -70,9 +70,10 @@ const HistoricalTrends = ({ historical, loading }: Props) => {
   };
 
   const currentTime = new Date();
-  const peakAQI = Math.max(...forecastData.map(d => d.aqi));
-  const peakTime = forecastData.find(d => d.aqi === peakAQI)?.time;
-  const minAQI = Math.min(...forecastData.map(d => d.aqi));
+  const hasData = forecastData.length > 0;
+  const peakAQI = hasData ? Math.max(...forecastData.map(d => d.aqi)) : null;
+  const peakTime = hasData ? forecastData.find(d => d.aqi === peakAQI)?.time : null;
+  const minAQI = hasData ? Math.min(...forecastData.map(d => d.aqi)) : null;
 
   return (
     <section id="forecast" className="py-12 bg-gradient-to-b from-blue-50 to-white">
@@ -104,8 +105,8 @@ const HistoricalTrends = ({ historical, loading }: Props) => {
                   </div>
                   <div>
                     <p className="text-sm text-gray-600 font-medium mb-1">Total Pollutants Expected</p>
-                    <p className="text-3xl font-bold text-orange-600">{peakAQI}</p>
-                    <p className="text-xs text-gray-500 mt-1">at {peakTime}</p>
+                    <p className="text-3xl font-bold text-orange-600">{peakAQI ?? "--"}</p>
+                    <p className="text-xs text-gray-500 mt-1">{peakTime ? `at ${peakTime}` : "search a city"}</p>
                   </div>
                 </div>
               </CardContent>
@@ -119,7 +120,7 @@ const HistoricalTrends = ({ historical, loading }: Props) => {
                   </div>
                   <div>
                     <p className="text-sm text-gray-600 font-medium mb-1">Best Air Quality</p>
-                    <p className="text-3xl font-bold text-green-600">{minAQI}</p>
+                    <p className="text-3xl font-bold text-green-600">{minAQI ?? "--"}</p>
                     <p className="text-xs text-gray-500 mt-1">Early morning hours</p>
                   </div>
                 </div>
